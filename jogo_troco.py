@@ -1,103 +1,89 @@
 import random
 
 def gerar_sistema_moedas():
-    moedas = [1] 
-    for _ in range(3): 
-        multiplicador = random.randint(2, 4)
+    moedas = [1]
+    for _ in range(5):
+        multiplicador = random.randint(2, 5)
         nova_moeda = moedas[-1] * multiplicador
         moedas.append(nova_moeda)
     return sorted(moedas, reverse=True)
 
 def algoritmo_guloso(alvo, moedas_desc):
     qtd_total = 0
-    distribuicao = {}
-    
     for moeda in moedas_desc:
         qtd_moedas = alvo // moeda
-        if qtd_moedas > 0:
-            distribuicao[moeda] = qtd_moedas
-            qtd_total += qtd_moedas
-            alvo %= moeda
-            
-    return qtd_total, distribuicao
+        qtd_total += qtd_moedas
+        alvo %= moeda
+    return qtd_total
 
 def jogar():
-    print("=" * 40)
-    print("JOGO DO ALGORITMO GULOSO (TROCO)")
-    print("=" * 40)
-    print("Objetivo: Entregar o troco exato usando a MENOR quantidade de moedas possível.\n")
-    
     rodadas = 3
-    resultados = []
+    historico = []
     
     for r in range(1, rodadas + 1):
-        print(f"--- RODADA {r} ---")
         moedas = gerar_sistema_moedas()
-        moedas_asc = sorted(moedas)
+        troco_alvo = random.randint(moedas[0], moedas[0] * 5)
+        valor_compra = random.randint(50, 500)
+        valor_pago = valor_compra + troco_alvo
         
+        print(f"RODADA {r}")
+        print(f"Valor da compra: {valor_compra}")
+        print(f"Valor pago: {valor_pago}")
+        print(f"Troco a ser devolvido: {troco_alvo}")
+        print(f"Moedas disponiveis: {sorted(moedas)}")
+        print("Digite a quantidade de moedas para devolver o troco.")
         
-        alvo = random.randint(moedas[0], moedas[0] * 4)
+        valor_jogador = 0
+        moedas_jogador = 0
         
-        print(f"Moedas disponíveis nesta rodada: {moedas_asc}")
-        print(f"Troco Alvo: {alvo}\n")
-        
-        
-        qtd_ideal, _ = algoritmo_guloso(alvo, moedas)
-        
-        
-        total_valor_jogador = 0
-        total_moedas_jogador = 0
-        
-        print("Quantas moedas de cada valor você vai usar?")
         for moeda in moedas:
             while True:
                 try:
-                    qtd = int(input(f" -> Moedas de {moeda}: "))
-                    if qtd < 0:
-                        print("    Por favor, insira um valor positivo.")
-                        continue
-                    total_valor_jogador += (qtd * moeda)
-                    total_moedas_jogador += qtd
-                    break
+                    texto = f"Quantidade de moedas de {moeda}: "
+                    qtd = int(input(texto))
+                    if qtd >= 0:
+                        valor_jogador += (qtd * moeda)
+                        moedas_jogador += qtd
+                        break
                 except ValueError:
-                    print("    Entrada inválida. Digite um número inteiro.")
+                    pass
         
+        ideal = algoritmo_guloso(troco_alvo, moedas)
         
-        valido = (total_valor_jogador == alvo)
-        if not valido:
-            print(f"\nERROU O VALOR! Você entregou {total_valor_jogador}, mas o troco era {alvo}.")
-            pontos = 0
-        else:
-            if total_moedas_jogador == qtd_ideal:
-                print(f"\nPERFEITO! Você usou a quantidade mínima ({qtd_ideal} moedas).")
-                pontos = 100
-            else:
-                print(f"\nVALOR CORRETO, MAS NÃO OTIMIZADO. Você usou {total_moedas_jogador} moedas. O ideal era {qtd_ideal}.")
-                pontos = 50
-                
-        resultados.append({
-            'rodada': r,
-            'alvo': alvo,
-            'valido': valido,
-            'suas_moedas': total_moedas_jogador,
-            'moedas_ideais': qtd_ideal,
-            'pontos': pontos
+        historico.append({
+            "rodada": r,
+            "compra": valor_compra,
+            "pago": valor_pago,
+            "troco": troco_alvo,
+            "entrega": valor_jogador,
+            "suas_moedas": moedas_jogador,
+            "moedas_ideais": ideal
         })
-        print("-" * 40 + "\n")
-        
+        print("\n" + "-"*40 + "\n")
+
+    print("RESULTADOS FINAIS")
+    print(f"{'RD':<4} | {'COMPRA':<7} | {'PAGO':<7} | {'TROCO':<7} | {'SOMA':<7} | {'SUAS':<5} | {'IDEAL':<5} | {'STATUS'}")
     
-    print("=" * 40)
-    print("RESULTADO FINAL")
-    print("=" * 40)
-    
-    pontuacao_total = 0
-    for res in resultados:
-        status = "Correto" if res['valido'] else "Incorreto"
-        print(f"Rodada {res['rodada']} | Alvo: {res['alvo']:3} | Status: {status:9} | Suas Moedas: {res['suas_moedas']:2} | Ideais: {res['moedas_ideais']:2} | Pontos: {res['pontos']}")
-        pontuacao_total += res['pontos']
+    pontos_totais = 0
+    for h in historico:
+        correto = h["entrega"] == h["troco"]
+        otimizado = h["suas_moedas"] == h["moedas_ideais"]
         
-    print("-" * 40)
-    print(f"Pontuação Total: {pontuacao_total} / {rodadas * 100}")
+        status = "ERRO TOTAL"
+        pontos = 0
+        
+        if correto and otimizado:
+            status = "PERFEITO"
+            pontos = 100
+        elif correto:
+            status = "NAO OTIMO"
+            pontos = 50
+            
+        print(f"{h['rodada']:<4} | {h['compra']:<7} | {h['pago']:<7} | {h['troco']:<7} | {h['entrega']:<7} | {h['suas_moedas']:<5} | {h['moedas_ideais']:<5} | {status}")
+        pontos_totais += pontos
+        
+    print("-" * 75)
+    print(f"PONTUACAO FINAL: {pontos_totais}")
 
 if __name__ == "__main__":
     jogar()
