@@ -8,7 +8,6 @@
 | Matrícula | Aluno | 
 | ----- | ----- | 
 | 231011810 | Rodrigo Ferreira do Amaral | 
-| xx/xxxxxx | [Nome do outro aluno, se houver] | 
 
 ## Sobre
 
@@ -71,3 +70,9 @@ Para rodar este projeto localmente, é recomendado utilizar um ambiente virtual 
 
 * **Sistema Canônico de Moedas:** Na geração aleatória das moedas, cada novo valor é gerado multiplicando o anterior garantindo matematicamente que a abordagem gulosa não falhará e sempre encontrará a solução ótima global.
 * **Algoritmo Guloso (Greedy):** A solução do jogo utiliza a heurística de subtrair o valor do troco iterativamente, escolhendo sempre a maior denominação de moeda disponível primeiro, até que o troco seja zerado.
+
+## Vídeo
+
+[![embed vídeo](https://img.youtube.com/vi/pJLkq1-TskQ/0.jpg)](https://www.youtube.com/watch?v=pJLkq1-TskQ)
+
+https://www.youtube.com/watch?v=pJLkq1-TskQ
